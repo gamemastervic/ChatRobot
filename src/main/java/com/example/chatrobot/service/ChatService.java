@@ -43,7 +43,12 @@ public class ChatService {
     private String model;
 
     public ChatService() {
-        this.httpClient = new OkHttpClient();
+        this.httpClient = new OkHttpClient.Builder()
+                .protocols(java.util.Arrays.asList(okhttp3.Protocol.HTTP_1_1))
+                .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .build();
         this.objectMapper = new ObjectMapper();
     }
 
@@ -92,25 +97,31 @@ public class ChatService {
                 if (!response.isSuccessful()) {
                     String errorBody = response.body() != null ? response.body().string() : "无响应体";
                     logger.error("API调用失败，状态码: {}, 响应体: {}", response.code(), errorBody);
-                    throw new RuntimeException("API调用失败，状态码: " + response.code());
+                    
+                    // 具体的错误处理
+                    if (response.code() == 401) {
+                        throw new RuntimeException("API密钥无效或已过期，请检查密钥配置");
+                    } else if (response.code() == 403) {
+                        throw new RuntimeException("访问被拒绝，请检查API权限");
+                    } else if (response.code() == 429) {
+                        throw new RuntimeException("请求频率过高，请稍后重试");
+                    } else if (response.code() >= 500) {
+                        throw new RuntimeException("服务器内部错误，请稍后重试");
+                    } else {
+                        throw new RuntimeException("API调用失败，状态码: " + response.code() + ", 错误: " + errorBody);
+                    }
                 }
 
                 // 解析响应
                 String responseBody = response.body().string();
                 JsonNode responseJson = objectMapper.readTree(responseBody);
                 
-                // 正确的阿里云响应格式：output.choices[0].message.content
+                // 正确的阿里云响应格式：output.text
                 if (responseJson.has("output") && 
-                    responseJson.get("output").has("choices") &&
-                    responseJson.get("output").get("choices").isArray() &&
-                    responseJson.get("output").get("choices").size() > 0) {
-                    
-                    JsonNode choice = responseJson.get("output").get("choices").get(0);
-                    if (choice.has("message") && choice.get("message").has("content")) {
-                        String aiReply = choice.get("message").get("content").asText();
-                        logger.info("AI回复: {}", aiReply);
-                        return aiReply;
-                    }
+                    responseJson.get("output").has("text")) {
+                    String aiReply = responseJson.get("output").get("text").asText();
+                    logger.info("AI回复: {}", aiReply);
+                    return aiReply;
                 }
                 
                 logger.error("API响应格式异常: {}", responseBody);
@@ -218,18 +229,12 @@ public class ChatService {
                 String responseBody = response.body().string();
                 JsonNode responseJson = objectMapper.readTree(responseBody);
                 
-                // 正确的阿里云响应格式：output.choices[0].message.content
+                // 正确的阿里云响应格式：output.text
                 if (responseJson.has("output") && 
-                    responseJson.get("output").has("choices") &&
-                    responseJson.get("output").get("choices").isArray() &&
-                    responseJson.get("output").get("choices").size() > 0) {
-                    
-                    JsonNode choice = responseJson.get("output").get("choices").get(0);
-                    if (choice.has("message") && choice.get("message").has("content")) {
-                        String reply = choice.get("message").get("content").asText();
-                        logger.info("简单对话 - AI回复: {}", reply);
-                        return reply;
-                    }
+                    responseJson.get("output").has("text")) {
+                    String reply = responseJson.get("output").get("text").asText();
+                    logger.info("简单对话 - AI回复: {}", reply);
+                    return reply;
                 }
                 
                 throw new RuntimeException("API响应格式异常");

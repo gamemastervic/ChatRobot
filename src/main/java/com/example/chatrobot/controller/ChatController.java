@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 聊天控制器
@@ -21,6 +23,8 @@ import javax.validation.Valid;
 @Controller
 @RequestMapping("/")
 public class ChatController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
 
     private final ChatService chatService;
 
@@ -49,6 +53,25 @@ public class ChatController {
             return ResponseEntity.ok(new ChatResponse(response, true));
         } catch (Exception e) {
             return ResponseEntity.ok(new ChatResponse("抱歉，我现在无法回答您的问题，请稍后再试。", false));
+        }
+    }
+
+    /**
+     * 简化API测试接口
+     */
+    @GetMapping("/api/test-simple")
+    @ResponseBody
+    public ResponseEntity<String> testSimpleApi() {
+        try {
+            // 最简单的测试请求
+            String testMessage = "你好";
+            logger.info("=== 开始简化API测试 ===");
+            String testResponse = chatService.simpleChat(testMessage);
+            logger.info("=== API测试成功 ===");
+            return ResponseEntity.ok("✅ API连接成功! AI回复: " + testResponse);
+        } catch (Exception e) {
+            logger.error("=== API测试失败 ===", e);
+            return ResponseEntity.ok("❌ API连接失败: " + e.getMessage());
         }
     }
 
