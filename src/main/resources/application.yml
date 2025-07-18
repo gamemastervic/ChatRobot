@@ -20,7 +20,7 @@ spring:
 
 # 阿里云通义千问API配置
 dashscope:
-  api-key: sk-6ba1613d893f44799f16b19da7e7c67b
+  api-key: ${DASHSCOPE_API_KEY:sk-6ba1613d893f44799f16b19da7e7c67b}  # 从环境变量读取API密钥
   model: qwen-plus  # 可选：qwen-turbo, qwen-plus, qwen-max
 
 logging:
