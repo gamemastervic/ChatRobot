@@ -20,14 +20,16 @@ spring:
 
 # 阿里云通义千问API配置
 dashscope:
-  api-key: ${DASHSCOPE_API_KEY:your-api-key-here}
+  api-key: ${DASHSCOPE_API_KEY:sk-6ba1613d893f44799f16b19da7e7c67b}
   model: qwen-plus  # 可选：qwen-turbo, qwen-plus, qwen-max
 
 logging:
   level:
     com.example.chatrobot: DEBUG
+    org.springframework.web: DEBUG
+    okhttp3: DEBUG
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%level] %logger{36} - %msg%n"
 
 # 自定义配置
 chatrobot:

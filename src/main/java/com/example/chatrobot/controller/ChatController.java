@@ -53,6 +53,20 @@ public class ChatController {
     }
 
     /**
+     * API连接测试接口
+     */
+    @GetMapping("/api/test")
+    @ResponseBody
+    public ResponseEntity<String> testApi() {
+        try {
+            String testResponse = chatService.simpleChat("测试连接");
+            return ResponseEntity.ok("✅ API连接成功! AI回复: " + testResponse);
+        } catch (Exception e) {
+            return ResponseEntity.ok("❌ API连接失败: " + e.getMessage());
+        }
+    }
+
+    /**
      * 健康检查接口
      */
     @GetMapping("/api/health")
