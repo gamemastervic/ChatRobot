@@ -1,0 +1,35 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: chat-robot
+  
+  # Thymeleaf配置
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false  # 开发环境关闭缓存
+
+  # 开发工具配置
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+# 阿里云通义千问API配置
+dashscope:
+  api-key: ${DASHSCOPE_API_KEY:your-api-key-here}
+  model: qwen-plus  # 可选：qwen-turbo, qwen-plus, qwen-max
+
+logging:
+  level:
+    com.example.chatrobot: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# 自定义配置
+chatrobot:
+  welcome-message: "你好！我是基于阿里Qwen模型的AI助手，有什么可以帮助您的吗？"
+  system-prompt: "你是一个友好、专业的AI助手，请用简洁明了的语言回答用户的问题。" 
