@@ -1,36 +1,38 @@
 @echo off
+chcp 65001 >nul 2>&1
 echo ===========================================
-echo    ChatRobot - AI聊天机器人 (Java 8版本)
+echo    ChatRobot - AI Chat Bot (Java 8)
 echo ===========================================
 echo.
 
-echo 正在检查Java环境...
+echo Checking Java environment...
 java -version
 if %errorlevel% neq 0 (
-    echo 错误：未找到Java，请安装Java 8或更高版本
+    echo Error: Java not found, please install Java 8+
     pause
     exit /b 1
 )
 
 echo.
-echo 正在检查Maven环境...
+echo Checking Maven environment...
 mvn -version 2>nul
 if %errorlevel% neq 0 (
-    echo Maven未安装，将尝试使用Maven Wrapper...
+    echo Maven not installed, trying Maven Wrapper...
     if exist mvnw.cmd (
-        echo 使用Maven Wrapper运行项目...
+        echo Starting project with Maven Wrapper...
         mvnw.cmd spring-boot:run
     ) else (
-        echo 请安装Maven或下载Maven Wrapper
-        echo 下载地址: https://maven.apache.org/download.cgi
+        echo Please install Maven or download Maven Wrapper
+        echo Download: https://maven.apache.org/download.cgi
         pause
         exit /b 1
     )
 ) else (
-    echo Maven已安装，使用Maven运行项目...
+    echo Maven found, starting project...
     mvn spring-boot:run
 )
 
 echo.
-echo 应用启动完成，请在浏览器中访问: http://localhost:8080
+echo Application started successfully!
+echo Visit: http://localhost:9090
 pause 
